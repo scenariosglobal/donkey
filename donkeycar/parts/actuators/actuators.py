@@ -7,6 +7,7 @@ are wrapped in a mixer class before being used in the drive loop.
 import time
 
 from ... import utils
+import RPi.GPIO as GPIO
 
         
 class PCA9685:
@@ -64,18 +65,30 @@ class PWMThrottle:
     MIN_THROTTLE = -1
     MAX_THROTTLE =  1
 
-    def __init__(self, controller=None,
+    def __init__(self, controller1=None,
+                       controller2=None, ##SunFounder PiCar-V back wheels controlled with 2 servo channel. Commented by abszolut
                        max_pulse=300,
                        min_pulse=490,
                        zero_pulse=350):
 
-        self.controller = controller
+        ##self.controller = controller
+        self.controller1 = controller1 ##PCA9685(4)
+        self.controller2 = controller2 ##PCA9685(5)
         self.max_pulse = max_pulse
         self.min_pulse = min_pulse
         self.zero_pulse = zero_pulse
         
+        #SunFounder PiCar-V back wheels forward. Commented by abszolut
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(17, GPIO.OUT)
+        GPIO.setup(27, GPIO.OUT)
+        GPIO.output(17,1)
+        GPIO.output(27,1)
+        
         #send zero pulse to calibrate ESC
-        self.controller.set_pulse(self.zero_pulse)
+        self.controller1.set_pulse(self.zero_pulse)
+        self.controller2.set_pulse(self.zero_pulse)
         time.sleep(1)
 
 
@@ -85,11 +98,15 @@ class PWMThrottle:
                                     0, self.MAX_THROTTLE, 
                                     self.zero_pulse, self.max_pulse)
         else:
+            """##only forward or stop. Commented by abszolut 
             pulse = utils.map_range(throttle,
                                     self.MIN_THROTTLE, 0, 
                                     self.min_pulse, self.zero_pulse)
+            """##
+            pulse = self.zero_pulse
 
-        self.controller.set_pulse(pulse)
+        self.controller1.set_pulse(pulse)
+        self.controller2.set_pulse(pulse)
         
     def shutdown(self):
         self.run(0) #stop vehicle
@@ -109,8 +126,10 @@ class Adafruit_DCMotor_Hat:
         self.BACKWARD = Adafruit_MotorHAT.BACKWARD
         self.mh = Adafruit_MotorHAT(addr=0x60) 
         
-        self.motor = self.mh.getMotor(motor_num)
-        self.motor_num = motor_num
+        ##self.motor1 = self.mh.getMotor(motor_num)
+        ##self.motor2 = self.mh.getMotor(motor_num+1)
+        ##self.motor_num1 = motor_num
+        ##self.motor_num2 = motor_num+1
         
         atexit.register(self.turn_off_motors)
         self.speed = 0
@@ -128,16 +147,22 @@ class Adafruit_DCMotor_Hat:
         self.speed = speed
         self.throttle = int(utils.map_range(abs(speed), -1, 1, -255, 255))
         
-        if speed > 0:            
-            self.motor.run(self.FORWARD)
+        if speed > 0:  
+            #self.mh.getMotor(4)          
+            self.mh.getMotor(4).run(self.FORWARD)
+            ##self.mh.getMotor(motor_num+1)
+            #self.mh.getMotor(4).run(self.FORWARD)
         else:
-            self.motor.run(self.BACKWARD)
-            
+            ##self.motor1.run(self.BACKWARD)
+            ##self.motor2.run(self.BACKWARD)
+            self.mh.getMotor(self.motor_num1).run(Adafruit_MotorHAT.RELEASE)
+            self.mh.getMotor(self.motor_num2).run(Adafruit_MotorHAT.RELEASE)
         self.motor.setSpeed(self.throttle)
         
 
     def shutdown(self):
-        self.mh.getMotor(self.motor_num).run(Adafruit_MotorHAT.RELEASE)
+        self.mh.getMotor(motor_num).run(Adafruit_MotorHAT.RELEASE)
+        self.mh.getMotor(motor_num+1).run(Adafruit_MotorHAT.RELEASE)
 
 class Maestro:
     '''
@@ -309,13 +334,3 @@ class Teensy:
             ret = ret.rstrip()
 
         return ret
-
-class MockController(object):
-    def __init__(self):
-        pass
-
-    def run(self, pulse):
-        pass
-
-    def shutdown(self):
-        pass
