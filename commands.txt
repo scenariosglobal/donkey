@@ -14,7 +14,7 @@ Raspberry part:
 
 RPi.GPIO Installation
 https://sourceforge.net/p/raspberry-gpio-python/wiki/install/
-sudo apt-get install python-rpi.gpio python3-rpi.gpio
+pip install RPi.GPIO
 
 create car
 donkey createcar --path ~/d2
