@@ -7,8 +7,6 @@ are wrapped in a mixer class before being used in the drive loop.
 import time
 
 from ... import utils
-import RPi.GPIO as GPIO
-
         
 class PCA9685:
     ''' 
@@ -70,6 +68,7 @@ class PWMThrottle:
                        max_pulse=300,
                        min_pulse=490,
                        zero_pulse=350):
+        import RPi.GPIO as GPIO
 
         ##self.controller = controller
         self.controller1 = controller1 ##PCA9685(4)
