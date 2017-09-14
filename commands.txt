@@ -1,0 +1,25 @@
+Ubuntu part:
+
+virtualenv env -p python3
+source env/bin/activate
+git clone https://github.com/scenariosglobal/donkey donkeycar
+pip install tensorflow==1.3.0
+pip install tensorflow-tensorboard==0.1.4
+pip install -e donkeycar
+
+train
+python ~/d2/manage.py train --tub tub_46_17-09-14 --model picar2
+
+Raspberry part:
+
+create car
+donkey createcar --path ~/d2
+
+drive
+python ~/d2/manage.py drive
+
+drive with auto pilot
+python ~/d2/manage.py drive --model /home/pi/d2/models/picar2
+
+SD Card restore
+sudo dd if=/media/abszolut/terra/Mikrokontroller/Raspberry/SunFounder/2/PiCar-V.img of=/dev/mmcblk0 bs=4M
