@@ -12,6 +12,10 @@ python ~/d2/manage.py train --tub tub_46_17-09-14 --model picar2
 
 Raspberry part:
 
+RPi.GPIO Installation
+https://sourceforge.net/p/raspberry-gpio-python/wiki/install/
+sudo apt-get install python-rpi.gpio python3-rpi.gpio
+
 create car
 donkey createcar --path ~/d2
 
