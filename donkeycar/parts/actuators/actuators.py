@@ -112,7 +112,6 @@ class PWMThrottle:
         self.run(0) #stop vehicle
 
 
-
 class Adafruit_DCMotor_Hat:
     ''' 
     Adafruit DC Motor Controller 
@@ -126,10 +125,8 @@ class Adafruit_DCMotor_Hat:
         self.BACKWARD = Adafruit_MotorHAT.BACKWARD
         self.mh = Adafruit_MotorHAT(addr=0x60) 
         
-        ##self.motor1 = self.mh.getMotor(motor_num)
-        ##self.motor2 = self.mh.getMotor(motor_num+1)
-        ##self.motor_num1 = motor_num
-        ##self.motor_num2 = motor_num+1
+        self.motor = self.mh.getMotor(motor_num)
+        self.motor_num = motor_num
         
         atexit.register(self.turn_off_motors)
         self.speed = 0
@@ -147,22 +144,16 @@ class Adafruit_DCMotor_Hat:
         self.speed = speed
         self.throttle = int(utils.map_range(abs(speed), -1, 1, -255, 255))
         
-        if speed > 0:  
-            #self.mh.getMotor(4)          
-            self.mh.getMotor(4).run(self.FORWARD)
-            ##self.mh.getMotor(motor_num+1)
-            #self.mh.getMotor(4).run(self.FORWARD)
+        if speed > 0:            
+            self.motor.run(self.FORWARD)
         else:
-            ##self.motor1.run(self.BACKWARD)
-            ##self.motor2.run(self.BACKWARD)
-            self.mh.getMotor(self.motor_num1).run(Adafruit_MotorHAT.RELEASE)
-            self.mh.getMotor(self.motor_num2).run(Adafruit_MotorHAT.RELEASE)
+            self.motor.run(self.BACKWARD)
+            
         self.motor.setSpeed(self.throttle)
         
 
     def shutdown(self):
-        self.mh.getMotor(motor_num).run(Adafruit_MotorHAT.RELEASE)
-        self.mh.getMotor(motor_num+1).run(Adafruit_MotorHAT.RELEASE)
+        self.mh.getMotor(self.motor_num).run(Adafruit_MotorHAT.RELEASE)
 
 class Maestro:
     '''
@@ -334,3 +325,13 @@ class Teensy:
             ret = ret.rstrip()
 
         return ret
+
+class MockController(object):
+    def __init__(self):
+        pass
+
+    def run(self, pulse):
+        pass
+
+    def shutdown(self):
+        pass
