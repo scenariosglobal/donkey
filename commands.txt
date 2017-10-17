@@ -24,7 +24,7 @@ drive
 python ~/d2/manage.py drive
 
 drive with auto pilot
-python ~/d2/manage.py drive --model /home/pi/d2/models/picar2
+python ~/d2/manage.py drive --model /home/pi/d2/models/picar3
 
 SD Card restore
 sudo dd if=/media/abszolut/terra/Mikrokontroller/Raspberry/SunFounder/2/PiCar-V.img of=/dev/mmcblk0 bs=4M
