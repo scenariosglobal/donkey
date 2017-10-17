@@ -6,7 +6,6 @@ git clone https://github.com/scenariosglobal/donkey donkeycar
 pip install tensorflow==1.3.0
 pip install tensorflow-tensorboard==0.1.4
 pip install -e donkeycar
-cd donkeycar
 donkey createcar --path ~/d2
 
 train
